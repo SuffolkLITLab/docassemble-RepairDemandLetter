@@ -1,0 +1,231 @@
+include:
+  - docassemble.MAVirtualCourt:basic-questions.yml
+---
+comment: |
+  The metadata section controls the tab title and saved interview title. You can delete this section if you include this YAML file in another YAML file.
+metadata:
+  title: |
+    Rental Repair Demand Letter
+  short title: |
+    Repair Demand Letter
+---
+comment: |
+  This section is used by MAVirtualCourts to control how some of the questions work.
+mandatory: True
+code: |
+  interview_metadata # make sure we initialize the object
+  if not defined("interview_metadata['Repair_Demand_Letter']"):
+    interview_metadata.initializeObject('Repair_Demand_Letter')
+  interview_metadata['Repair_Demand_Letter'].update({
+    'title': 'Rental Repair Demand Letter',
+    'short title': 'Repair Demand Letter',
+    'description': 'This letter is the second letter used as a notification device to landlords by tenants demanding they make necessary repairs to on or within their rental property based on issue(s) they are experiencing. ',
+    'original_form': '',
+    'allowed courts': [
+      'Boston Municipal Court',
+      'District Court',
+      'Housing Court',
+      'Superior Court',
+    ],
+    'categories': [
+      'Housing',
+    ],
+    'logic block variable': 'Repair_Demand_Letter',
+    'attachment block variable': 'Repair_Demand_Letter_attachment',
+    'typical role': 'unknown',
+  })
+---
+features:
+  navigation: True
+---
+sections:
+  - review_Repair_Demand_Letter: Review your answers
+---
+id: interview_order_Repair_Demand_Letter
+code: |
+  # This is a placeholder to control logic flow in this interview
+
+  basic_questions_intro_screen 
+  Repair_Demand_Letter_intro
+  # Set the allowed courts for this interview
+  allowed_courts = interview_metadata["Repair_Demand_Letter"]["allowed courts"]
+  nav.set_section('review_Repair_Demand_Letter')
+  # Below sets the user_role by asking a question.
+  # You can set user_role directly instead to either 'plaintiff' or 'defendant'
+  user_ask_role
+  issue.gather()
+  # Set the answer file name.
+  set_parts(subtitle=str(users))
+  set_progress(10.0)
+  users[0]
+  users[0].address_block()
+  other_parties[0]
+  set_progress(20.0)
+  start_rent_date
+  str(other_parties)
+  monetary_demand
+  set_progress(30.0)
+  issue_experience
+  incident_date
+  repair_notice
+  set_progress(40.0)
+  users[0].address_block()
+  other_parties[0].address_block()
+  set_progress(50.0)
+  # Save (anonymized) interview statistics.
+  store_variables_snapshot(data={'zip': users[0].address.zip})
+  Repair_Demand_Letter_preview_question # Pre-canned preview screen
+  basic_questions_signature_flow
+  users[0].signature
+  Repair_Demand_Letter = True
+---
+comment: |
+  This question is used to introduce your interview. Please customize
+id: Rental Repair Demand Letter
+continue button field: Repair_Demand_Letter_intro
+question: |
+  Rental Repair Demand Letter
+subquestion: |
+  This letter is the second letter used as a notification device to landlords by tenants demanding they make necessary repairs to on or within their rental property based on issue(s) they are experiencing.
+---
+id: Review your form before you sign it
+continue button field: Repair_Demand_Letter_preview_question
+question: |
+  Review your form before you sign it
+subquestion: |
+  Here is a preview of the form you'll sign on the next page. 
+  
+   ${ pdf_concatenate(Repair_Demand_Letter_attachment['preview'], filename='Repair_Demand_Letter.pdf')}
+---
+objects:
+  - issues: DAList
+---
+code: |
+  # I think we always have at least one issue for this letter, right?
+  # so no need to ask the question
+  issue.there_are_any = True
+---
+question: |
+  Issue
+list collect: True
+fields:
+  - issue: issues[i]
+    datatype: area
+    # area defaults to 3 rows. set rows: 4 to make 4 rows, etc.
+---
+question: |
+  On what day did you start paying rent for your rental property? 
+fields:
+  - First Rental Payment Date: start_rent_date
+    datatype: date
+---
+question: |
+  On approximately what day did you first begin experiencing issue(s) on or within your rental propert? 
+fields:
+  - Rental Property Issue Date: incident_date
+    datatype: date
+---
+question: |
+  On what day did you notify your landloard of the issue(s) you were experiencing with your rental property?  
+fields:
+  - Repair Notice Date: repair_notice
+    datatype: date
+---
+question: |
+  Describe how the issue(s) have impacted the use on or within your rental property.
+fields:
+  - Issue Experience: issue_experience
+    datatype: area
+---
+question: |
+  How much do you deserve to get reimbursed?
+fields:
+  - Monetary Demand: monetary_demand
+    datatype: text
+---
+progress: 100
+mandatory: True
+id: Your form is ready to download and file
+question: |
+  Your form is ready to download and file
+subquestion: |
+  Thank you ${users}. Your form is ready to download and deliver.
+  
+  Below is a preview of your form.
+  
+  ${pdf_concatenate(Repair_Demand_Letter_attachment['final'], filename='Repair_Demand_Letter.pdf') }
+need: Repair_Demand_Letter
+attachment code: Repair_Demand_Letter_attachment['final']
+---
+objects:
+  - Repair_Demand_Letter_attachment: DADict
+---
+attachment:
+    variable name: Repair_Demand_Letter_attachment[i]
+    name: Repair Demand Letter
+    filename: Repair_Demand_Letter
+    docx template file: Form_10_-_Repair_Demand_Letter.docx
+---
+id: Repair_Demand_Letter review screen
+event: review_Repair_Demand_Letter
+question: |
+  Placeholder Review Screen
+subquestion: |
+  Edit your answers below
+review: 
+  - Edit: issue
+    button: |
+      Issue:
+      > ${ single_paragraph(issue) }
+  - Edit: users[0].signature
+    button: |
+      users[0].signature:
+      ${ users[0].signature }
+  - Edit: users[0].name.first
+    button: |
+      users[0]:
+      ${ users[0] }
+  - Edit: users[0].address.address
+    button: |
+      users[0].address.address:
+      ${ users[0].address.address }
+  - Edit: other_parties[0].name.first
+    button: |
+      other_parties[0]:
+      ${ other_parties[0] }
+  - Edit: start_rent_date
+    button: |
+      start_rent_date:
+      ${ start_rent_date }
+  - Edit: other_parties[0].name.first
+    button: |
+      other_parties:
+      ${ other_parties }
+  - Edit: users[0].monetary_demand
+    button: |
+      monetary_demand:
+      ${ monetary_demand }
+  - Edit: issue_experience
+    button: |
+      issue_experience:
+      ${ issue_experience }
+  - Edit: incident_date
+    button: |
+      incident_date:
+      ${ incident_date }
+  - Edit: repair_notice
+    button: |
+      repair_notice:
+      ${ repair_notice }
+  - Edit: users[0].address.address
+    button: |
+      users[0].address.address:
+      ${ users[0].address.address }
+  - Edit: other_parties[0].address.address
+    button: |
+      other_parties[0].address.address:
+      ${ other_parties[0].address.address }
+  - Edit: users[0].address
+    button: |
+      users[0].address:
+      ${ users[0].address }
