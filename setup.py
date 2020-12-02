@@ -43,7 +43,7 @@ def find_package_data(where='.', package='', exclude=standard_exclude, exclude_d
     return out
 
 setup(name='docassemble.RepairDemandLetter',
-      version='0.0.2',
+      version='0.0.3',
       description=('This interview helps create a letter to be used as a notification device for landlords demanding to make necessary repairs on or within the rental property. '),
       long_description='# docassemble.RepairDemandLetter\r\n\r\nThis interview helps create a letter to be used as a notification device for landlords demanding to make necessary repairs on or within the rental property. \r\n\r\n## Author\r\n\r\nChristopher Selak, cselak@su.suffolk.edu\r\n\r\n',
       long_description_content_type='text/markdown',
