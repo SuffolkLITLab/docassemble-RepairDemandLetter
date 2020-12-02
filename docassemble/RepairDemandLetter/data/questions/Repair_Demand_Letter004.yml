@@ -53,7 +53,7 @@ code: |
   # Below sets the user_role by asking a question.
   # You can set user_role directly instead to either 'plaintiff' or 'defendant'
   user_ask_role
-  issue.gather()
+  issues.gather()
   # Set the answer file name.
   set_parts(subtitle=str(users))
   set_progress(10.0)
@@ -65,11 +65,10 @@ code: |
   str(other_parties)
   monetary_demand
   set_progress(30.0)
-  issue_experience
+  issues_experience
   incident_date
   repair_notice
   set_progress(40.0)
-  users[0].address_block()
   other_parties[0].address_block()
   set_progress(50.0)
   # Save (anonymized) interview statistics.
@@ -101,15 +100,15 @@ objects:
   - issues: DAList
 ---
 code: |
-  # I think we always have at least one issue for this letter, right?
+  # I think we always have at least one issues for this letter, right?
   # so no need to ask the question
-  issue.there_are_any = True
+  issues.there_are_any = True
 ---
 question: |
   Issue
 list collect: True
 fields:
-  - issue: issues[i]
+  - issues: issues[i]
     datatype: area
     # area defaults to 3 rows. set rows: 4 to make 4 rows, etc.
 ---
@@ -134,7 +133,7 @@ fields:
 question: |
   Describe how the issue(s) have impacted the use on or within your rental property.
 fields:
-  - Issue Experience: issue_experience
+  - Issue Experience: issues_experience
     datatype: area
 ---
 question: |
@@ -173,10 +172,10 @@ question: |
 subquestion: |
   Edit your answers below
 review: 
-  - Edit: issue
+  - Edit: issues
     button: |
       Issue:
-      > ${ single_paragraph(issue) }
+      > ${ single_paragraph(issues) }
   - Edit: users[0].signature
     button: |
       users[0].signature:
@@ -205,10 +204,10 @@ review:
     button: |
       monetary_demand:
       ${ monetary_demand }
-  - Edit: issue_experience
+  - Edit: issues_experience
     button: |
-      issue_experience:
-      ${ issue_experience }
+      issues_experience:
+      ${ issues_experience }
   - Edit: incident_date
     button: |
       incident_date:
