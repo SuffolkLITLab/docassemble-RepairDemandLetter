@@ -9,6 +9,9 @@ metadata:
   short title: |
     Repair Demand Letter
 ---
+code: |
+  interview_short_title = "Ask your landlord to make repairs"    
+---
 comment: |
   This section is used by MAVirtualCourts to control how some of the questions work.
 mandatory: True
