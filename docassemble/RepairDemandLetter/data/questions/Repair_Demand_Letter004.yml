@@ -51,9 +51,7 @@ objects:
 id: interview_order_Repair_Demand_Letter
 code: |
   # This is a placeholder to control logic flow in this interview
-
   basic_questions_intro_screen 
-  Repair_Demand_Letter_intro
   # Set the allowed courts for this interview
   allowed_courts = interview_metadata["Repair_Demand_Letter"]["allowed courts"]
   nav.set_section('review_Repair_Demand_Letter')
@@ -61,38 +59,103 @@ code: |
   # You can set user_role directly instead to either 'plaintiff' or 'defendant'
   user_role = "plaintiff"
   issues.gather()
+  other_parties.there_is_another = False
   # Set the answer file name.
   set_parts(subtitle=str(users))
   set_progress(10.0)
   users[0]
   users[0].address_block()
   other_parties[0]
+  other_parties[0].address_block()
   set_progress(20.0)
   start_rent_date
-  str(other_parties)
-  monetary_demand
-  set_progress(30.0)
-  issues_experience
   incident_date
   repair_notice
+  set_progress(30.0)
+  str(other_parties)
+  issues_experience
   set_progress(40.0)
-  other_parties[0].address_block()
+  monetary_demand
   set_progress(50.0)
   # Save (anonymized) interview statistics.
-  store_variables_snapshot(data={'zip': users[0].address.zip})
+  # store_variables_snapshot(data={'zip': users[0].address.zip})
   Repair_Demand_Letter_preview_question # Pre-canned preview screen
   basic_questions_signature_flow
   users[0].signature
   Repair_Demand_Letter = True
+  form_approved_for_email_filing = False
 ---
-comment: |
-  This question is used to introduce your interview. Please customize
-id: Rental Repair Demand Letter
-continue button field: Repair_Demand_Letter_intro
+code: |
+  form_approved_for_email_filing= False
+---
+id: basic questions intro screen
+decoration: form-lineal
 question: |
-  Rental Repair Demand Letter
+  ${interview_short_title}: Mass Access Project
 subquestion: |
-  This letter is the second letter used as a notification device to landlords by tenants demanding they make necessary repairs to on or within their rental property based on issue(s) they are experiencing.
+  % if form_approved_for_email_filing:
+  The MassAccess Project can help **Massachusetts residents** complete and file court forms in 3 steps:
+  % else:
+  The MassAccess Project can help **Massachusetts residents** complete and download forms in 3 steps:
+  % endif
+  
+  **Step 1**. Answer questions that will fill in your form for you.  
+  **Step 2**. Preview the completed form.  
+  % if form_approved_for_email_filing:  
+  Step 3. Email the form to the court using this secure website and save copies
+  for yourself for later reference.  
+  % else:
+  **Step 3**. Download and print the final form. You need to mail it to your landlord.
+  % endif
+  
+    **This letter is the second letter used as a notification device to landlords       by tenants demanding they make necessary repairs to on or within their           rental property based on issue(s) they are experiencing.**
+  
+  
+  Tap the {green words} in any screen for a definition or more information.
+  
+
+  % if chat_partners_available().help:
+  Live help is currently available in this interview. Click the speech bubble
+  (:comment-alt:) in the navigation bar to connect to a live advocate for help.
+  % endif
+
+fields:
+  - To continue, you must accept the [terms of use](https://massaccess.suffolklitlab.org/privacy/): acknowledged_information_use
+    datatype: checkboxes
+    none of the above: False    
+    minlength: 1
+    choices:
+      - I accept the terms of use.
+    validation messages:
+      minlength: |
+        You cannot continue unless you agree to the terms of use.        
+continue button field: basic_questions_intro_screen
+terms:
+  green words: |
+    Green words are legal terms or a short way of referring to something that needs more explanation. The definition or explanation pops up when you tap the green words.
+right: |
+  % if user_has_saved_answers:
+  ${fa_icon("bell", color="primary", size="sm")}
+  Saved answers available!  
+  
+  ${action_button_html(url_action('load_answer'), icon="folder-open", label=word("View answers"), size="sm" )}
+  % endif    
+---
+id: your address
+question: |
+  What is your address?
+fields:
+  - Street address: users[0].address.address
+    address autocomplete: True
+  - Unit: users[0].address.unit
+    required: False
+  - City: users[0].address.city
+  - State: users[0].address.state
+    code: |
+      states_list()
+    default: MA      
+  - Zip: users[0].address.zip
+    required: False
 ---
 id: Review your form before you sign it
 continue button field: Repair_Demand_Letter_preview_question
@@ -106,48 +169,46 @@ subquestion: |
 objects:
   - issues: DAList
 ---
+objects: 
+  - user: VCIndividual
+  - other_parties: PeopleList
+---
 code: |
   # I think we always have at least one issues for this letter, right?
   # so no need to ask the question
   issues.there_are_any = True
 ---
 question: |
-  Issue
+  What issues are you having with the property?
+subquestion: |
+  Please create a new  field for each  issue by clicking 'Add another' below.
 list collect: True
 fields:
-  - issues: issues[i]
+  - Issue: issues[i]
     datatype: area
     # area defaults to 3 rows. set rows: 4 to make 4 rows, etc.
 ---
 question: |
-  On what day did you start paying rent for your rental property? 
+  Please fill in the following dates:
 fields:
-  - First Rental Payment Date: start_rent_date
+  - 'On what day did you start paying rent for your rental property?': start_rent_date
+    datatype: date
+  - 'On approximately what day did you first begin experiencing issue(s) on or within your rental property?': incident_date
+    datatype: date
+  - 'On what day did you notify your landloard of the issue(s) you were experiencing with your rental property?': repair_notice
     datatype: date
 ---
 question: |
-  On approximately what day did you first begin experiencing issue(s) on or within your rental propert? 
+  How much do you believe you deserve to get reimbursed?
 fields:
-  - Rental Property Issue Date: incident_date
-    datatype: date
----
-question: |
-  On what day did you notify your landloard of the issue(s) you were experiencing with your rental property?  
-fields:
-  - Repair Notice Date: repair_notice
-    datatype: date
+  - Monetary Demand: monetary_demand
+    datatype: currency
 ---
 question: |
   Describe how the issue(s) have impacted the use on or within your rental property.
 fields:
   - Issue Experience: issues_experience
     datatype: area
----
-question: |
-  How much do you deserve to get reimbursed?
-fields:
-  - Monetary Demand: monetary_demand
-    datatype: text
 ---
 id: landlords name
 question: |
@@ -176,7 +237,7 @@ attachment:
     variable name: Repair_Demand_Letter_attachment[i]
     name: Repair Demand Letter
     filename: Repair_Demand_Letter
-    docx template file: Form_10_-_Repair_Demand_Letter.docx
+    docx template file: Form10_RepairDemandLetter.docx
 ---
 id: Repair_Demand_Letter review screen
 event: review_Repair_Demand_Letter
