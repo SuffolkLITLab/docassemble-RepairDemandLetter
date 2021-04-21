@@ -188,6 +188,15 @@ fields:
     datatype: area
     # area defaults to 3 rows. set rows: 4 to make 4 rows, etc.
 ---
+id: your name
+question:  |
+  What is your full name?
+fields:
+  - First Name: users[0].name.first
+  - Middle Name: users[0].name.middle
+    required: False
+  - Last Name: users[0].name.last
+---
 question: |
   Please fill in the following dates:
 fields:
@@ -207,14 +216,17 @@ fields:
 question: |
   Describe how the issue(s) have impacted the use on or within your rental property.
 fields:
-  - Issue Experience: issues_experience
+  - Issue(s) Experience: issues_experience
     datatype: area
 ---
 id: landlords name
 question: |
-  What is your landlord's name?
+  What is your landlord's full name?
 fields:
-  - Landlord's full name: other_parties[0].name.first
+  - First name: other_parties[0].name.first
+  - Middle Name: users[0].name.middle
+    required: False
+  - Last name: other_parties[0].name.last
 ---
 progress: 100
 mandatory: True
