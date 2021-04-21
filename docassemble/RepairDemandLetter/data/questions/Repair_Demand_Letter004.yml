@@ -198,13 +198,13 @@ fields:
   - Last Name: users[0].name.last
 ---
 question: |
-  Please fill in the following dates:
+  Please fill in the following dates in regards to your rental property:
 fields:
-  - 'On what day did you start paying rent for your rental property?': start_rent_date
+  - 'When did you start paying rent?': start_rent_date
     datatype: date
-  - 'On approximately what day did you first begin experiencing issue(s) on or within your rental property?': incident_date
+  - 'When did you first begin experiencing issue(s?': incident_date
     datatype: date
-  - 'On what day did you notify your landloard of the issue(s) you were experiencing with your rental property?': repair_notice
+  - 'When did you notify your landloard of the issue(s) you were experiencing?': repair_notice
     datatype: date
 ---
 question: |
