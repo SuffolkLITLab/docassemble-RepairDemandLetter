@@ -186,6 +186,7 @@ list collect: True
 fields:
   - Issue: issues[i]
     datatype: area
+    rows: 1
     # area defaults to 3 rows. set rows: 4 to make 4 rows, etc.
 ---
 id: your name
@@ -198,13 +199,13 @@ fields:
   - Last Name: users[0].name.last
 ---
 question: |
-  Please fill in the following dates in regards to your rental property:
+  When did you:
 fields:
-  - 'When did you start paying rent?': start_rent_date
+  - 'Start paying rent?': start_rent_date
     datatype: date
-  - 'When did you first begin experiencing issue(s?': incident_date
+  - 'Begin experiencing issue(s)?': incident_date
     datatype: date
-  - 'When did you notify your landloard of the issue(s) you were experiencing?': repair_notice
+  - 'Notify your landloard of the issue(s) you were experiencing?': repair_notice
     datatype: date
 ---
 question: |
@@ -218,6 +219,7 @@ question: |
 fields:
   - Issue(s) Experience: issues_experience
     datatype: area
+    rows: 2
 ---
 id: landlords name
 question: |
