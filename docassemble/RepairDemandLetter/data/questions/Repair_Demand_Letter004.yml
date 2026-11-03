@@ -178,6 +178,7 @@ code: |
   # so no need to ask the question
   issues.there_are_any = True
 ---
+id: "what issues are you having with the property"
 question: |
   What issues are you having with the property?
 subquestion: |
@@ -198,6 +199,7 @@ fields:
     required: False
   - Last Name: users[0].name.last
 ---
+id: "when did you"
 question: |
   When did you:
 fields:
@@ -208,12 +210,14 @@ fields:
   - 'Notify your landloard of the issue(s) you were experiencing?': repair_notice
     datatype: date
 ---
+id: "how much do you believe you deserve to get reimbursed"
 question: |
   How much do you believe you deserve to get reimbursed?
 fields:
   - Monetary Demand: monetary_demand
     datatype: currency
 ---
+id: "describe how the issue s have impacted the use on or within your rental property"
 question: |
   Describe how the issue(s) have impacted the use on or within your rental property.
 fields:
