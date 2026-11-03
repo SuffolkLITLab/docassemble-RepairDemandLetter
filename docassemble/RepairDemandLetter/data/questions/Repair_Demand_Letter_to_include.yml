@@ -234,6 +234,7 @@ review:
       % endfor
 ---
 continue button field: other_parties.revisit
+id: "edit other parties"
 question: |
   Edit other_parties
 subquestion: |
@@ -255,6 +256,7 @@ confirm: True
 
 ---
 continue button field: users.revisit
+id: "edit users"
 question: |
   Edit users
 subquestion: |
