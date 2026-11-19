@@ -8,7 +8,7 @@ metadata:
   title: |
     Repair Demand Letter
   short title: |
-    Repair Demand Letter
+    Write a repair demand letter to your landlord
   authors:
     - Sofija Belajcic
 ---
@@ -25,9 +25,7 @@ code: |
 ---
 code: |
   github_repo_name =  'docassemble-RepairDemandLetter'
----
-code: |
-  interview_short_title = "Write a repair demand letter to your landlord"
+
 ---
 code: |
   al_form_type = 'letter'
@@ -39,38 +37,13 @@ objects:
 sections:
   - review_Repair_Demand_Letter: Review your answers
 ---
-#################### Interview order #####################
-comment: |
-  Controls order and branching logic for questions specific to this form
-id: interview_order_Repair_Demand_Letter
-code: |
-  # Set the allowed courts for this interview
-  allowed_courts = interview_metadata["Repair_Demand_Letter"]["allowed courts"]
-  nav.set_section('review_Repair_Demand_Letter')
-  user_role = 'na'
-  users.gather()
-  set_parts(subtitle=str(users))
-  users[0].address.address
-  other_parties.gather()
-  set_progress(20)
-  other_parties[0].address.address
-  time_frame
-  notification_date
-  set_progress(40)
-  if written_notification == True:
-     letter_date
-  tenant_repair_issue_description
-  effect_of_conditions
-  set_progress(60)
-  amount
-  interview_order_Repair_Demand_Letter = True
----
 ###################### Main order ######################
 comment: |
   This block includes the logic for standalone interviews.
   Delete mandatory: True to include in another interview
 mandatory: True
 code: |
+  repair_metadata_ready
   al_intro_screen
   Repair_Demand_Letter_intro
   interview_order_Repair_Demand_Letter
