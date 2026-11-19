@@ -52,7 +52,7 @@ setup(name='docassemble.RepairDemandLetter',
       license='The MIT License',
       url='https://courtformsonline.org',
       packages=find_namespace_packages(),
-      install_requires=['docassemble.ALMassachusetts>=0.1.0', 'docassemble.AssemblyLine>=2.11.3'],
+      install_requires=['docassemble.ALMassachusetts>=0.1.0', 'docassemble.AssemblyLine>=2.11.3', 'docassemble.LITLabTheme'],
       zip_safe=False,
       package_data=find_package_data(where='docassemble/RepairDemandLetter/', package='docassemble.RepairDemandLetter'),
      )

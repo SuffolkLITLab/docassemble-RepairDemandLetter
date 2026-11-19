@@ -2,6 +2,7 @@
 include:
   - docassemble.AssemblyLine:al_package.yml
   - docassemble.ALMassachusetts:al_massachusetts.yml
+  - docassemble.LITLabTheme:main.yml
   - Repair_Demand_Letter_to_include.yml
 ---
 metadata:
