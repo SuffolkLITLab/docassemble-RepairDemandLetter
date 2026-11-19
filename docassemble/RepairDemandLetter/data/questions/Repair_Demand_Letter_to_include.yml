@@ -3,22 +3,22 @@ include:
   - docassemble.AssemblyLine:al_package.yml
   - docassemble.ALMassachusetts:al_massachusetts.yml
 ---
-mandatory: True
 comment: |
   This contains metadata that will not be overwritten if this YAML file is included in another
   file. Each file gets its own key in the interview_metadata dictionary.
   Most keys are not currently used at runtime, other than "allowed courts".
 code: |
   interview_metadata
-  if not defined("interview_metadata['Repair_Demand_Letter']"):
+  package_title
+  if "allowed courts" not in interview_metadata.get("Repair_Demand_Letter", {}):
     interview_metadata.initializeObject("Repair_Demand_Letter")
     interview_metadata["Repair_Demand_Letter"].update({
       "al_weaver_version": "1.6.2",
       "generated on": "2022-03-31",
-      "title": "Repair Demand Letter",
-      "short title": "Repair Demand Letter",
+      "title": package_title,
+      "short title": package_title,
       "description": "A letter of demand for relief under the Consumer Protection Act, Chapter 93A",
-      "original_form": "https://www.masslegalhelp.org/housing/lt1-form-10-repair-demand.pdf",
+      "original_form": "https://www.masslegalhelp.org/sites/default/files/2025-04/Form%2010.Repair%20Demand%20Ltr%202025.pdf",
       "allowed courts": [
       ],
       "categories": [
@@ -27,6 +27,7 @@ code: |
       "attachment block variable": "Repair_Demand_Letter_attachment",
       "typical role": "na",
     })
+  repair_metadata_ready = True
 ---
 objects:
   - other_parties: ALPeopleList.using(ask_number=True,target_number=1)
@@ -37,10 +38,13 @@ comment: |
   Controls order and branching logic for questions specific to this form
 id: interview_order_Repair_Demand_Letter
 code: |
-  # Set the allowed courts for this interview
+  repair_metadata_ready
   allowed_courts = interview_metadata["Repair_Demand_Letter"]["allowed courts"]
   nav.set_section('review_Repair_Demand_Letter')
   user_role = 'na'
+  repair_93a_scope_reviewed
+  if not isinstance(users, ALPeopleList) or not isinstance(other_parties, ALPeopleList):
+    repair_legacy_session
   users.gather()
   set_parts(subtitle=str(users))
   users[0].address.address
@@ -50,8 +54,8 @@ code: |
   time_frame
   notification_date
   set_progress(40)
-  if written_notification == True:
-     letter_date
+  if written_notification:
+    letter_date
   tenant_repair_issue_description
   effect_of_conditions
   set_progress(60)
@@ -72,7 +76,7 @@ subquestion: |
   - mice or insects, 
   - or any other bad housing condition that is your landlord's responsibility.
   
-  Your landlord has 30 days to answer your letter with an amount that is fair.
+  Chapter 93A gives your landlord 30 days to make a good-faith response.
 
   ${ collapse_template(help_93a_damages_explanation) }
 
@@ -88,15 +92,35 @@ content: |
   - does not answer the letter, or
   - answers but does not offer to pay you a fair amount
   
-  Then a court may decide that you have a right to be paid triple damages.
-  Triple damages means that a judge or jury calculates the amount that the law says 
-  would repay you for the harm caused by your landlord. 
-  Then they multiply it by 3. For example:
-  
-  If | then the amount you would get is
-  ---|-----------------------------------
-  The jury decides that $500 would repay you | $1,500 instead
+  A court may award more than the amount of your loss in some cases.
+  See the [Massachusetts Attorney General’s guide to a 30-day demand letter](https://www.mass.gov/info-details/30-day-demand-letter).
+---
+id: Chapter 93A housing scope
+question: |
+  Does the consumer protection law apply to your landlord?
+subquestion: |
+  Chapter 93A generally applies when a landlord is in the business of renting housing.
+  This letter is for a private landlord. A city, state agency, or public housing authority is generally outside its scope.
+  A rent voucher by itself does not make your landlord a government agency.
 
+  Your private landlord is generally in the business of renting if either statement applies:
+
+  * Your landlord lives in a different building.
+  * Your building has at least five units.
+
+  Other facts can matter, including whether your landlord rents out other property.
+  If you are unsure, you can [find legal help](https://www.masslegalhelp.org/find-lawyer).
+  You can also read the [Attorney General’s consumer protection guide](https://www.mass.gov/info-details/the-massachusetts-consumer-protection-law).
+continue button field: repair_93a_scope_reviewed
+---
+id: old repair letter session
+event: repair_legacy_session
+question: |
+  Start a new repair demand letter
+subquestion: |
+  This session was started in an older version. Start a new letter to use the current interview.
+buttons:
+  - Start over: restart
 ---
 sets:
   - other_parties[i].name.first
@@ -131,16 +155,22 @@ fields:
 ---
 id: When did you first notify the landlord of the bad conditions
 question: |
-  What is the first time that you told the landlord about the problem?
+  When did you first tell your landlord about the problem?
 subquestion: |
-  State the best date that you know. You can say an exact date or an estimate, like
-  "June of 2020".
+  Use your best estimate if you do not remember the exact day.
 fields:
-  - Date notified landlord: notification_date
-  - Did you notify your landlord about the problem in writing?: written_notification
+  - Date you first told your landlord: notification_date
+    datatype: date
+    max: ${ today() }
+  - Did you tell your landlord in writing?: written_notification
     datatype: yesnoradio
-  - When?: letter_date
+  - Date you first told your landlord in writing: letter_date
+    datatype: date
+    max: ${ today() }
     show if: written_notification
+validation code: |
+  if written_notification and date_difference(starting=notification_date, ending=letter_date).days < 0:
+    validation_error("The written notice date must be on or after the first notice date.", field="letter_date")
 ---
 id: Describe the repairs
 question: |
@@ -194,90 +224,41 @@ event: review_Repair_Demand_Letter
 question: |
   Review your answers
 review:
-  - Edit: other_parties.revisit
+  - Edit: other_parties[0].name.first
     button: |
-      **Other parties**
-
-      % for item in other_parties:
-        * ${ item }
-      % endfor
+      **Landlord**: ${ other_parties[0].name.full() }
+  - Edit: other_parties[0].address.address
+    button: |
+      **Landlord’s address**: ${ other_parties[0].address.on_one_line() }
   - Edit: effect_of_conditions
     button: |
-      **Effect of Conditions**:
+      **How the conditions affected you**:
       ${ effect_of_conditions }
   - Edit: notification_date
     button: |
-      **Date of Notification**:
+      **When you first told your landlord**:
       ${ notification_date }
   - Edit: tenant_repair_issue_description
     button: |
-      **Tenant repair issue description**:
+      **What needs to be repaired**:
       ${ tenant_repair_issue_description }
   - Edit: amount
     button: |
-      **Amount**:
+      **Amount you are asking for**:
       ${ currency(amount) }
   - Edit: time_frame
     button: |
-      **Time frame**:
+      **When you moved in**:
       ${ time_frame }
-  - Edit: letter_date
+  - Edit: notification_date
     button: |
-      **Date of Letter**:
-      ${ letter_date }
-  - Edit: users.revisit
+      **Written notice**: ${ letter_date if written_notification else "None" }
+  - Edit: users[0].name.first
     button: |
-      **Users**
-
-      % for item in users:
-        * ${ item }
-      % endfor
----
-continue button field: other_parties.revisit
-id: "edit other parties"
-question: |
-  Edit other_parties
-subquestion: |
-  ${ other_parties.table }
-
-  ${ other_parties.add_action() }
----
-table: other_parties.table
-rows: other_parties
-columns:
-  - Address: |
-      row_item.address.block() if defined("row_item.address.address") else ""
-  - Name: |
-      row_item.name.full() if defined("row_item.name.first") else ""
-edit:
-  - address.address
-  - name.first
-confirm: True
-
----
-continue button field: users.revisit
-id: "edit users"
-question: |
-  Edit users
-subquestion: |
-  ${ users.table }
-
-  ${ users.add_action() }
----
-table: users.table
-rows: users
-columns:
-  - Signature: |
-      row_item.signature if defined("row_item.signature") else ""
-  - Address: |
-      row_item.address.block() if defined("row_item.address.address") else ""
-  - Name: |
-      row_item.name.full() if defined("row_item.name.first") else ""
-edit:
-  - signature
-  - address.address
-  - name.first
-confirm: True
+      **Tenant**: ${ users[0].name.full() }
+  - Edit: users[0].address.address
+    button: |
+      **Tenant’s address**: ${ users[0].address.on_one_line() }
 ---
 objects:
   - Repair_Demand_Letter_post_interview_instructions: ALDocument.using(title="Instructions", filename="Repair_Demand_Letter_next_steps.docx", has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
@@ -288,9 +269,11 @@ attachments:
     filename: Post-interview-instructions     
     variable name: Repair_Demand_Letter_post_interview_instructions[i]        
     skip undefined: True
+    tagged pdf: True
     docx template file: Repair_Demand_Letter_next_steps.docx
   - name: Repair Demand Letter attachment
     filename: Repair_Demand_Letter.docx     
     variable name: Repair_Demand_Letter_attachment[i]
     skip undefined: True
+    tagged pdf: True
     docx template file: Repair_Demand_Letter.docx
