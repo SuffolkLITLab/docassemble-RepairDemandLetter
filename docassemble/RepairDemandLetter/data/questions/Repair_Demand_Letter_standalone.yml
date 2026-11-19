@@ -5,12 +5,33 @@ include:
   - Repair_Demand_Letter_to_include.yml
 ---
 metadata:
-  title: |
-    Repair Demand Letter
-  short title: |
-    Write a repair demand letter to your landlord
+  title: Ask your landlord for repairs and compensation (Chapter 93A)
+  short title: Chapter 93A repair demand letter
+  description: >-
+    Write a Massachusetts 30-day demand letter if your landlord has not fixed unsafe
+    or unhealthy conditions in your home. Ask for repairs and compensation under Chapter 93A.
+  can_I_use_this_form: |
+    Use this letter if your private landlord rents housing as a business and has not made needed repairs.
+    The interview explains what to consider before you decide whether to use the letter.
+  before_you_start: |
+    Gather your landlord’s mailing address, the dates you asked for repairs, and any notes about the harm or costs.
+  when_you_are_finished: |
+    Review the letter, send it to your landlord, and keep a copy and proof of mailing.
   authors:
     - Sofija Belajcic
+  jurisdiction: NAM-US-US+MA
+  languages:
+    - en
+  LIST_topics:
+    - HO-05-01-00-00
+  tags:
+    - HO-05-01-00-00
+  original_form: https://www.masslegalhelp.org/sites/default/files/2025-04/Form%2010.Repair%20Demand%20Ltr%202025.pdf
+  help_page_title: Massachusetts Attorney General’s guide to a 30-day demand letter
+  help_page_url: https://www.mass.gov/info-details/30-day-demand-letter
+  form_titles:
+    - Chapter 93A repair demand letter
+  form_numbers: []
 ---
 code: |
   interview_metadata['main_interview_key'] =  'Repair_Demand_Letter'
